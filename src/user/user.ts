@@ -1,30 +1,49 @@
+import { NotValidSignupRequestException } from './exception/user.exception';
+
 export interface SignUpRequest {
   email: string;
   username: string;
   password: string;
 }
+
 export interface SignUpResponse {
   id: string;
   email: string;
   username: string;
   createdAt: Date;
 }
-export function isValidSignUpRequest(request: SignUpRequest): boolean {
-  if (!isValidEmail(request.email)) return false;
-  if (!isValidPassword(request.password)) return false;
-  return isValidUsername(request.username);
+
+export function validateSignupRequest(request: SignUpRequest) {
+  if (
+    !isValidEmail(request.email) ||
+    !isValidPassword(request.password) ||
+    !isValidUsername(request.username)
+  ) {
+    throw new NotValidSignupRequestException();
+  }
 }
 
-const emailRegExp = /[a-z0-9]+@[a-z]+\.[a-z]{2,3}/;
-const passwordRegExp = /\w{4,20}/;
-const usernameRegExp = /\w{6,20}/;
+const emailRegExp = /\S+@\S+\.\S+/;
+const passwordRegExp = /^[a-zA-Z0-9]{4,20}$/;
+const usernameRegExp = /^[a-zA-Z0-9]{6,20}$/;
 
-function isValidEmail(email: string): boolean {
+export function isValidEmail(email: string): boolean {
+  if (!email) {
+    return false;
+  }
   return emailRegExp.test(email);
 }
-function isValidUsername(username: string): boolean {
+
+export function isValidUsername(username: string): boolean {
+  if (!username) {
+    return false;
+  }
   return usernameRegExp.test(username);
 }
-function isValidPassword(password: string): boolean {
+
+export function isValidPassword(password: string): boolean {
+  if (!password) {
+    return false;
+  }
   return passwordRegExp.test(password);
 }
