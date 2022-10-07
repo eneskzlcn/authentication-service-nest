@@ -17,7 +17,7 @@ export class SignUpExceptionFilter implements ExceptionFilter {
   catch(exception: any, host: ArgumentsHost): void {
     const { httpAdapter } = this.httpAdapterHost;
     const ctx = host.switchToHttp();
-    let status = HttpStatus.SEE_OTHER;
+    let status = HttpStatus.INTERNAL_SERVER_ERROR;
     let message = 'Internal Server Error';
     console.log(exception);
     if (
