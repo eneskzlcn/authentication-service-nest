@@ -1,8 +1,18 @@
-import { Body, Controller, Logger, Post, UseFilters } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Logger,
+  Post,
+  UseFilters,
+  Res,
+  HttpStatus,
+} from '@nestjs/common';
 import { UserService } from './user.service';
-import { SignUpExceptionFilter } from './exception/user.filter';
+import { SignUpUserRelatedExceptionFilter } from './exception/user.filter';
+import { DatabaseExceptionFilter } from '../common/exception/database/exception.filter';
 
-import { validateSignupRequest, SignUpRequest, SignUpResponse } from './user';
+import { validateSignupRequest, SignUpRequest } from './user';
+import { Response } from 'express';
 
 @Controller('')
 export class UserController {
@@ -11,11 +21,15 @@ export class UserController {
   constructor(private readonly loginService: UserService) {}
 
   @Post('/signup')
-  @UseFilters(SignUpExceptionFilter)
-  async signUp(@Body() signUpRequest: SignUpRequest): Promise<SignUpResponse> {
+  @UseFilters(SignUpUserRelatedExceptionFilter, DatabaseExceptionFilter)
+  async signUp(
+    @Body() signUpRequest: SignUpRequest,
+    @Res() response: Response,
+  ) {
     this.logger.debug(`Signup request arrived: ${signUpRequest}`);
-    validateSignupRequest(signUpRequest);
-    return this.loginService.signUp(signUpRequest);
+    validateSignupRequest(this.logger, signUpRequest);
+    const signUpResponseData = await this.loginService.signUp(signUpRequest);
+    return response.status(HttpStatus.OK).send(signUpResponseData);
   }
 
   @Post('/signin')
