@@ -8,7 +8,7 @@ import {
   UserWithUsernameAlreadyExistsException,
 } from './exception/user.exception';
 import { Logger } from '@nestjs/common';
-import { DatabaseInsertException } from '../exception/database.exception';
+import { DatabaseException } from '../common/exception/database/exception';
 
 @Injectable()
 export class UserService {
@@ -31,12 +31,11 @@ export class UserService {
     }
     const savedUser = await this.userRepository
       .save(new User(signUpRequest.email, signUpRequest.username))
-      .catch((e) => {
-        console.log(e);
+      .catch((error) => {
         this.logger.error(
-          `Error occurred when saving the user to the database : ${e.message}`,
+          `Error occurred when saving the user to the database : ${error.message}`,
         );
-        throw new DatabaseInsertException(e.message);
+        throw new DatabaseException(error.message);
       });
     return {
       username: savedUser.username,
@@ -49,17 +48,29 @@ export class UserService {
     return 'Hello World';
   }
   async isUserExistsByEmail(email: string): Promise<boolean> {
-    const user = await this.userRepository.findOne({
-      where: { email: email },
-      lock: { mode: 'optimistic', version: 1 },
-    });
+    const user = await this.userRepository
+      .findOne({
+        where: { email: email },
+      })
+      .catch((error) => {
+        this.logger.error(
+          `Error occurred when checking is user exists in database with email ${error.message}`,
+        );
+        throw new DatabaseException(error.message);
+      });
     return !!user;
   }
   async isUserExistsByUsername(username: string): Promise<boolean> {
-    const user = await this.userRepository.findOne({
-      where: { username: username },
-      lock: { mode: 'optimistic', version: 1 },
-    });
+    const user = await this.userRepository
+      .findOne({
+        where: { username: username },
+      })
+      .catch((error) => {
+        this.logger.error(
+          `Error occurred when checking is user exists by username ${error.username}`,
+        );
+        throw new DatabaseException(error.message);
+      });
     return !!user;
   }
 }
