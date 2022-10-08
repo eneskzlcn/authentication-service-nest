@@ -1,29 +1,26 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../../entities/user.entity';
-import { Repository } from 'typeorm';
 import { SignUpRequest, SignUpResponse } from './user';
 import {
   UserWithEmailAlreadyExistsException,
   UserWithUsernameAlreadyExistsException,
 } from './user.exception';
-import { logger } from '@logger/tslog.logger';
 
-import { DatabaseException } from '@exceptions/database.exception';
+import { UserRepository } from '@modules/user/user.repository';
 
 @Injectable()
 export class UserService {
-  constructor(
-    @InjectRepository(User) private userRepository: Repository<User>,
-  ) {}
+  constructor(private readonly userRepository: UserRepository) {}
   async signUp(signUpRequest: SignUpRequest): Promise<SignUpResponse> {
-    if (await this.isUserExistsByEmail(signUpRequest.email)) {
+    if (await this.userRepository.isUserExistsByEmail(signUpRequest.email)) {
       throw new UserWithEmailAlreadyExistsException();
     }
-    if (await this.isUserExistsByUsername(signUpRequest.username)) {
+    if (
+      await this.userRepository.isUserExistsByUsername(signUpRequest.username)
+    ) {
       throw new UserWithUsernameAlreadyExistsException();
     }
-    const savedUser = await this.saveUser(
+    const savedUser = await this.userRepository.saveUser(
       new User(signUpRequest.email, signUpRequest.password),
     );
     return <SignUpResponse>{
@@ -35,40 +32,5 @@ export class UserService {
   }
   signIn(): string {
     return 'Hello World';
-  }
-  async saveUser(user: User): Promise<User> {
-    let savedUser = <User>{};
-    try {
-      savedUser = await this.userRepository.save(user);
-    } catch (error) {
-      throw new DatabaseException(error.message);
-    }
-    return savedUser;
-  }
-  async isUserExistsByEmail(email: string): Promise<boolean> {
-    const user = await this.userRepository
-      .findOne({
-        where: { email: email },
-      })
-      .catch((error) => {
-        logger.error(
-          `Error occurred when checking is user exists in database with email ${error.message}`,
-        );
-        throw new DatabaseException(error.message);
-      });
-    return !!user;
-  }
-  async isUserExistsByUsername(username: string): Promise<boolean> {
-    const user = await this.userRepository
-      .findOne({
-        where: { username: username },
-      })
-      .catch((error) => {
-        logger.error(
-          `Error occurred when checking is user exists by username ${error.username}`,
-        );
-        throw new DatabaseException(error.message);
-      });
-    return !!user;
   }
 }
