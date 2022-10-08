@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { HttpAdapterHost } from '@nestjs/core';
 import { DatabaseException } from '@exceptions/database.exception';
+import { logger } from '@logger/tslog.logger';
 
 @Catch(DatabaseException)
 export class DatabaseExceptionFilter implements ExceptionFilter {
@@ -18,6 +19,7 @@ export class DatabaseExceptionFilter implements ExceptionFilter {
       message: 'Internal Server Error',
       path: httpAdapter.getRequestUrl(ctx.getRequest()),
     };
+    logger.error(exception.message);
     httpAdapter.reply(
       ctx.getResponse(),
       responseBody,
