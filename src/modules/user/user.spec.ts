@@ -5,7 +5,7 @@ import {
   SignUpRequest,
   validateSignupRequest,
 } from './user';
-import { NotValidSignupRequestException } from './exception/user.exception';
+import { NotValidSignupRequestException } from './user.exception';
 
 describe('Email Validation', () => {
   test('given falsy email then it should return false when isValidEmail called', () => {
@@ -81,7 +81,7 @@ describe('Password Validation', () => {
 });
 
 describe('Validate Signup Request', () => {
-  test('given valid signup request then it should not throw exception when validateSignupRequest called', () => {
+  test('given valid signup request then it should not throw exceptions when validateSignupRequest called', () => {
     const givenSignupRequest: SignUpRequest = {
       email: 'asdsaf@gmail.com',
       password: 'asdasd',

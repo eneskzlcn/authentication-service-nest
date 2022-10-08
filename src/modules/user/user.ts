@@ -1,5 +1,4 @@
-import { NotValidSignupRequestException } from './exception/user.exception';
-import { Logger } from '@nestjs/common';
+import { NotValidSignupRequestException } from './user.exception';
 
 export interface SignUpRequest {
   email: string;
@@ -14,13 +13,12 @@ export interface SignUpResponse {
   createdAt: Date;
 }
 
-export function validateSignupRequest(logger: Logger, request: SignUpRequest) {
+export function validateSignupRequest(request: SignUpRequest) {
   if (
     !isValidEmail(request.email) ||
     !isValidPassword(request.password) ||
     !isValidUsername(request.username)
   ) {
-    logger.error(`Not valid signup request: ${request}`);
     throw new NotValidSignupRequestException();
   }
 }

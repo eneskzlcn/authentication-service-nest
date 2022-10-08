@@ -16,6 +16,33 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "paths": {
+      "@modules/*": [
+        "src/modules/*"
+      ],
+      "@exceptions/*": [
+        "src/common/exceptions/*"
+      ],
+      "@filters/*": [
+        "src/common/filters/*"
+      ],
+      "@middlewares/*": [
+        "src/common/middlewares/*"
+      ],
+      "@guards/*": [
+        "src/common/guards/*"
+      ],
+      "@entities/*": [
+        "src/common/entities/*"
+      ],
+      "@logger/*": [
+        "src/common/logger/*"
+      ],
+      "@config/*": [
+        "src/config/*"
+      ]
+    },
+    "declarationMap": true,
   }
 }

@@ -1,51 +1,49 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from '../entity/user.entity';
+import { User } from '../../entities/user.entity';
 import { Repository } from 'typeorm';
 import { SignUpRequest, SignUpResponse } from './user';
 import {
   UserWithEmailAlreadyExistsException,
   UserWithUsernameAlreadyExistsException,
-} from './exception/user.exception';
-import { Logger } from '@nestjs/common';
-import { DatabaseException } from '../common/exception/database/exception';
+} from './user.exception';
+import { logger } from '@logger/tslog.logger';
+
+import { DatabaseException } from '@exceptions/database.exception';
 
 @Injectable()
 export class UserService {
-  private readonly logger = new Logger(UserService.name);
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
   ) {}
   async signUp(signUpRequest: SignUpRequest): Promise<SignUpResponse> {
     if (await this.isUserExistsByEmail(signUpRequest.email)) {
-      this.logger.debug(
-        `User already exist with email: ${signUpRequest.email}`,
-      );
       throw new UserWithEmailAlreadyExistsException();
     }
     if (await this.isUserExistsByUsername(signUpRequest.username)) {
-      this.logger.debug(
-        `User already exist with username: ${signUpRequest.username}`,
-      );
       throw new UserWithUsernameAlreadyExistsException();
     }
-    const savedUser = await this.userRepository
-      .save(new User(signUpRequest.email, signUpRequest.username))
-      .catch((error) => {
-        this.logger.error(
-          `Error occurred when saving the user to the database : ${error.message}`,
-        );
-        throw new DatabaseException(error.message);
-      });
-    return {
+    const savedUser = await this.saveUser(
+      new User(signUpRequest.email, signUpRequest.password),
+    );
+    return <SignUpResponse>{
       username: savedUser.username,
       id: savedUser.id,
       email: savedUser.email,
       createdAt: savedUser.createdAt,
-    } as SignUpResponse;
+    };
   }
   signIn(): string {
     return 'Hello World';
+  }
+  async saveUser(user: User): Promise<User> {
+    let savedUser = <User>{};
+    try {
+      savedUser = await this.userRepository.save(user);
+    } catch (error) {
+      throw new DatabaseException(error.message);
+    }
+    return savedUser;
   }
   async isUserExistsByEmail(email: string): Promise<boolean> {
     const user = await this.userRepository
@@ -53,7 +51,7 @@ export class UserService {
         where: { email: email },
       })
       .catch((error) => {
-        this.logger.error(
+        logger.error(
           `Error occurred when checking is user exists in database with email ${error.message}`,
         );
         throw new DatabaseException(error.message);
@@ -66,7 +64,7 @@ export class UserService {
         where: { username: username },
       })
       .catch((error) => {
-        this.logger.error(
+        logger.error(
           `Error occurred when checking is user exists by username ${error.username}`,
         );
         throw new DatabaseException(error.message);

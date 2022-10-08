@@ -5,7 +5,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { HttpAdapterHost } from '@nestjs/core';
-import { DatabaseException } from './exception';
+import { DatabaseException } from '@exceptions/database.exception';
 
 @Catch(DatabaseException)
 export class DatabaseExceptionFilter implements ExceptionFilter {
