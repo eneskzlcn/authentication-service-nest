@@ -13,5 +13,6 @@ const logLevelColors: TLogLevelColor = {
 export const logger = new TSLogger({
   instanceName: 'my instance',
   setCallerAsLoggerName: true,
+  displayFunctionName: false,
   logLevelsColors: logLevelColors,
 });
