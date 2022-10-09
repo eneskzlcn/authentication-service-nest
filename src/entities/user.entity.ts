@@ -1,29 +1,34 @@
 import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
+    Column,
+    CreateDateColumn,
+    Entity,
+    PrimaryGeneratedColumn,
+    UpdateDateColumn,
 } from 'typeorm';
 
 @Entity('users')
 export class User {
-  constructor(email: string, username: string) {
-    this.email = email;
-    this.username = username;
-  }
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+    constructor(email: string, username: string, password: string) {
+        this.email = email;
+        this.username = username;
+        this.password = password;
+    }
 
-  @Column({ type: 'text', name: 'email', nullable: false, unique: true })
-  email: string;
+    @PrimaryGeneratedColumn('uuid')
+    id: string;
 
-  @Column({ type: 'text', name: 'username', nullable: false })
-  username: string;
+    @Column({ type: 'text', name: 'email', nullable: false, unique: true })
+    email: string;
 
-  @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
-  createdAt: Date;
+    @Column({ type: 'text', name: 'username', nullable: false })
+    username: string;
 
-  @UpdateDateColumn({ name: 'updated_at', type: 'timestamp' })
-  updatedAt: Date;
+    @Column({ type: 'text', name: 'password', nullable: false })
+    password: string;
+
+    @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
+    createdAt: Date;
+
+    @UpdateDateColumn({ name: 'updated_at', type: 'timestamp' })
+    updatedAt: Date;
 }
