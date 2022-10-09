@@ -1,3 +1,3 @@
 export default () => ({
-  port: parseInt(process.env.SERVER_PORT) || 3200,
+    port: parseInt(process.env.SERVER_PORT),
 });
