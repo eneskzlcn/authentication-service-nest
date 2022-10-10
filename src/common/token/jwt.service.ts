@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService, JwtSignOptions } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { JWTUserData } from '../../entities/jwt.user';
 
 @Injectable()
 export class TokenService {
-    accessTokenOptions: JwtSignOptions;
-    refreshTokenOptions: JwtSignOptions;
+    private accessTokenOptions: JwtSignOptions;
+    private refreshTokenOptions: JwtSignOptions;
 
     constructor(
         private readonly jwtService: JwtService,
@@ -16,20 +17,20 @@ export class TokenService {
     }
 
     private async generateToken(
-        name: string,
+        email: string,
         sub: string,
         options: JwtSignOptions
     ): Promise<string> {
-        const payload = { name: name, sub: sub };
+        const payload: JWTUserData = { email: email, sub: sub };
         return this.jwtService.signAsync(payload, options);
     }
 
-    async generateAccessToken(name: string, sub: string) {
-        return this.generateToken(name, sub, this.accessTokenOptions);
+    async generateAccessToken(email: string, sub: string) {
+        return this.generateToken(email, sub, this.accessTokenOptions);
     }
 
-    async generateRefreshToken(name: string, sub: string) {
-        return this.generateToken(name, sub, this.refreshTokenOptions);
+    async generateRefreshToken(email: string, sub: string) {
+        return this.generateToken(email, sub, this.refreshTokenOptions);
     }
 
     initializeAccessTokenOptions(): void {
