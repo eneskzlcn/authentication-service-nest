@@ -33,6 +33,9 @@
       "@guards/*": [
         "src/common/guards/*"
       ],
+      "@strategies/*": [
+        "src/common/strategies/*"
+      ],
       "@entities/*": [
         "src/common/entities/*"
       ],
@@ -43,6 +46,6 @@
         "src/config/*"
       ]
     },
-    "declarationMap": true,
+    "declarationMap": true
   }
 }
