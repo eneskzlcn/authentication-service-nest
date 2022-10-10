@@ -1,10 +1,10 @@
 import {
     Body,
     Controller,
+    HttpCode,
     HttpStatus,
     Logger,
     Post,
-    Res,
     UseFilters,
 } from '@nestjs/common';
 import { UserService } from './user.service';
@@ -12,7 +12,6 @@ import { BadUserRequestExceptionFilter } from '@filters/bad.request.exception.fi
 import { DatabaseExceptionFilter } from '@filters/database.exception.filter';
 
 import { CreateUserRequest, validateCreateUserRequest } from './user';
-import { Response } from 'express';
 
 @Controller('user')
 export class UserController {
@@ -22,15 +21,10 @@ export class UserController {
 
     @Post('')
     @UseFilters(BadUserRequestExceptionFilter, DatabaseExceptionFilter)
-    async signUp(
-        @Body() createUserRequest: CreateUserRequest,
-        @Res() response: Response
-    ) {
+    @HttpCode(HttpStatus.OK)
+    async create(@Body() createUserRequest: CreateUserRequest) {
         this.logger.debug(`Signup request arrived: ${createUserRequest}`);
         validateCreateUserRequest(createUserRequest);
-        const signUpResponseData = await this.loginService.create(
-            createUserRequest
-        );
-        return response.status(HttpStatus.OK).send(signUpResponseData);
+        return await this.loginService.create(createUserRequest);
     }
 }
