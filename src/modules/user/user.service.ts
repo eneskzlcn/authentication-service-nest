@@ -1,35 +1,51 @@
 import { Injectable } from '@nestjs/common';
 import { User } from '../../entities/user.entity';
-import { CreateUserRequest, SignUpResponse } from './user';
+import {
+    CreateUserRequest,
+    SignUpResponse,
+    validateCreateUserRequest,
+} from './user';
 import {
     UserWithEmailAlreadyExistsException,
     UserWithUsernameAlreadyExistsException,
 } from '@modules/user/user.exception';
 
 import { UserRepository } from '@modules/user/user.repository';
+import { HashService } from '../../common/hash/hash.service';
 
 @Injectable()
 export class UserService {
-    constructor(private readonly userRepository: UserRepository) {}
+    constructor(
+        private readonly userRepository: UserRepository,
+        private readonly hashService: HashService
+    ) {}
 
-    async create(signUpRequest: CreateUserRequest): Promise<SignUpResponse> {
+    async create(
+        createUserRequest: CreateUserRequest
+    ): Promise<SignUpResponse> {
+        validateCreateUserRequest(createUserRequest);
         if (
-            await this.userRepository.isUserExistsByEmail(signUpRequest.email)
+            await this.userRepository.isUserExistsByEmail(
+                createUserRequest.email
+            )
         ) {
             throw new UserWithEmailAlreadyExistsException();
         }
         if (
             await this.userRepository.isUserExistsByUsername(
-                signUpRequest.username
+                createUserRequest.username
             )
         ) {
             throw new UserWithUsernameAlreadyExistsException();
         }
+        const encryptedPassword = await this.hashService.encrypt(
+            createUserRequest.password
+        );
         const savedUser = await this.userRepository.saveUser(
             new User(
-                signUpRequest.email,
-                signUpRequest.username,
-                signUpRequest.password
+                createUserRequest.email,
+                createUserRequest.username,
+                encryptedPassword
             )
         );
         return <SignUpResponse>{

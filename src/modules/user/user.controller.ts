@@ -11,7 +11,7 @@ import { UserService } from './user.service';
 import { BadUserRequestExceptionFilter } from '@filters/bad.request.exception.filter';
 import { DatabaseExceptionFilter } from '@filters/database.exception.filter';
 
-import { CreateUserRequest, validateCreateUserRequest } from './user';
+import { CreateUserRequest } from './user';
 
 @Controller('user')
 export class UserController {
@@ -24,7 +24,6 @@ export class UserController {
     @HttpCode(HttpStatus.OK)
     async create(@Body() createUserRequest: CreateUserRequest) {
         this.logger.debug(`Signup request arrived: ${createUserRequest}`);
-        validateCreateUserRequest(createUserRequest);
         return await this.loginService.create(createUserRequest);
     }
 }
