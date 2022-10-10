@@ -4,6 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JWTStrategies } from '@strategies/jwt.strategy';
 import { JWTUserData } from '../../entities/jwt.user';
+import { logger } from '@logger/tslog.logger';
 
 @Injectable()
 export class JwtAccessTokenStrategy extends PassportStrategy(
@@ -19,7 +20,12 @@ export class JwtAccessTokenStrategy extends PassportStrategy(
         });
     }
 
-    validate(payload: JWTUserData) {
-        return payload;
+    validate(payload: any): JWTUserData {
+        const userData: JWTUserData = {
+            email: payload.email,
+            sub: payload.sub,
+        };
+        logger.debug(userData);
+        return userData;
     }
 }
