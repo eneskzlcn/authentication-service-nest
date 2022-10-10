@@ -1,16 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { UserService } from '@modules/user/user.service';
-import { JwtService, JwtSignOptions } from '@nestjs/jwt';
-import { LoginRequest, LoginResponse } from '@modules/auth/auth.model';
+import {
+    LoginRequest,
+    LoginResponse,
+    SignupRequest,
+} from '@modules/auth/auth.model';
 import { BadUserRequestException } from '@exceptions/bad.request.exception';
-import { ConfigService } from '@nestjs/config';
+import { TokenService } from '../../common/token/jwt.service';
 
 @Injectable()
 export class AuthService {
     constructor(
         private readonly userService: UserService,
-        private readonly jwtService: JwtService,
-        private readonly configService: ConfigService
+        private readonly tokenService: TokenService
     ) {}
 
     async validateUser(username: string, password: string): Promise<any> {
@@ -32,15 +34,13 @@ export class AuthService {
             loginRequest.password
         );
 
-        const accessToken = await this.generateToken(
+        const accessToken = await this.tokenService.generateAccessToken(
             user.email,
-            user.id,
-            this.accessTokenOptions()
+            user.id
         );
-        const refreshToken = await this.generateToken(
+        const refreshToken = await this.tokenService.generateRefreshToken(
             user.email,
-            user.id,
-            this.refreshTokenOptions()
+            user.id
         );
         return <LoginResponse>{
             access_token: accessToken,
@@ -48,28 +48,7 @@ export class AuthService {
         };
     }
 
-    async generateToken(
-        name: string,
-        sub: string,
-        options: JwtSignOptions
-    ): Promise<string> {
-        const payload = { name: name, sub: sub };
-        return this.jwtService.signAsync(payload, options);
-    }
-
-    accessTokenOptions(): JwtSignOptions {
-        return <JwtSignOptions>{
-            expiresIn: this.configService.get('JWT_AT_EXPIRATION'),
-            secret: this.configService.get('JWT_AT_SECRET'),
-            algorithm: this.configService.get('JWT_AT_ALGORITHM'),
-        };
-    }
-
-    refreshTokenOptions(): JwtSignOptions {
-        return <JwtSignOptions>{
-            expiresIn: this.configService.get('JWT_RT_EXPIRATION'),
-            secret: this.configService.get('JWT_RT_SECRET'),
-            algorithm: this.configService.get('JWT_RT_ALGORITHM'),
-        };
+    async signup(signupRequest: SignupRequest): Promise<LoginResponse> {
+        return {} as LoginResponse;
     }
 }
