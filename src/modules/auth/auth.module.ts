@@ -5,9 +5,10 @@ import { UserModule } from '@modules/user/user.module';
 import { JwtRefreshTokenStrategy } from '@strategies/jwt.rt.strategy';
 import { JwtAccessTokenStrategy } from '@strategies/jwt.at.strategy';
 import { TokenModule } from '../../common/token/jwt.module';
+import { HashModule } from '../../common/hash/hash.module';
 
 @Module({
-    imports: [TokenModule, UserModule],
+    imports: [TokenModule, UserModule, HashModule],
     controllers: [AuthController],
     providers: [AuthService, JwtRefreshTokenStrategy, JwtAccessTokenStrategy],
 })
