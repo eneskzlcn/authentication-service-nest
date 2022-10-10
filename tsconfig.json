@@ -33,6 +33,9 @@
       "@guards/*": [
         "src/common/guards/*"
       ],
+      "@decorators/*": [
+        "src/common/decorators/*"
+      ],
       "@strategies/*": [
         "src/common/strategies/*"
       ],
